@@ -1,0 +1,91 @@
+import com.android.build.gradle.api.ApplicationVariant
+import groovy.json.JsonSlurper
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+android {
+    compileSdkVersion 31
+    buildToolsVersion "30.0.3"
+    flavorDimensions "version"
+    lintOptions {
+        checkReleaseBuilds false
+    }
+
+    defaultConfig {
+        applicationId "com.connect.winuall"
+        vectorDrawables.useSupportLibrary = true
+        minSdkVersion 22
+        targetSdkVersion 30
+        versionCode 2
+        versionName "1"
+        multiDexEnabled true
+        flavorDimensions "version"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    def flavourFile = file('flavours/flavourfiles.json')
+    def flavourKeys = new JsonSlurper().parseText(flavourFile.text)
+    def configs = flavourKeys.flavours
+    def resMap = [:]
+    def serviceMap=[:]
+    configs.each { config ->
+        android.productFlavors.create(config.flavourName, { flavor ->
+            resMap.put(config.flavourName,config.introsliders)
+            serviceMap.put(config.flavourName,config.introsliders)
+            serviceMap.put(config.flavourName + "site_base_url", config.site_base_url)
+            flavor.dimension = 'version'
+            flavor.applicationId = config.appId
+            manifestPlaceholders = [ appIcon          : "@mipmap/ic_launcher",
+                                     flavored_app_name: config.appName,
+                                     appId: config.appId,
+                                     siteBaseUrl: config.site_base_url]
+        })
+    }
+
+
+    applicationVariants.all { ApplicationVariant variant ->
+        for (flavor in variant.productFlavors) {
+            // variant.outputs[0].outputFile = file("$project.buildDir/${YourNewPath}/${YourNewApkName}.apk")
+            //variant.resValue("string", "flavored_name", resMap.get(flavor.name))
+            variant.resValue("string", "prefix", flavor.name)
+            variant.resValue("string","firebaseHelperUrl","https://quiz-live-stats.firebaseio.com")
+            variant.resValue("string","firebaseChatBaseUrl","https://winuall-connect-chat-db.firebaseio.com")
+            variant.resValue("string","firebaseUserListUrl","https://winuall-connect-chatprofiledb.firebaseio.com")
+            variant.resValue("string", "introsliders", serviceMap.get(flavor.name))
+            variant.resValue("string", "siteBaseUrl", serviceMap.get(flavor.name + "site_base_url"))
+            //implementation('com.android.support:leanback-v17:22.2.1')
+            //variant.resValue("bool", "introsliders", serviceMap.get(flavor.name))
+        }
+    }
+
+}
+
+dependencies {
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+}

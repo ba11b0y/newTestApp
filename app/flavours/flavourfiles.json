@@ -1,0 +1,15 @@
+{
+  "flavours": [
+    {
+      "appName": "demoapp",
+      "applabel": "ic_sp",
+      "imageUrl": "https://api-files-connect.s3.ap-south-1.amazonaws.com/1607707178247.png",
+      "prefix": "dingle",
+      "appId": "com.demoapp.connect",
+      "flavourName": "demoapp",
+      "playstore_account": "hopelabs",
+      "introsliders": "false",
+      "site_base_url": "plus.winuall.com"
+    }
+  ]
+}

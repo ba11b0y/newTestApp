@@ -26,7 +26,6 @@ echo "$contents"
 echo "$contents"| jq -n '.flavours |= [inputs]'> app/flavours/flavourfiles.json
 echo "$contents"| jq -n '.flavours |= [inputs]'> marketPlace/flavours/flavourfiles.json
 
-# Asset generation
 # Prerequistes for the below is a gm binary.
 # Run `brew install graphicsmagick` on Mac
 # Run `sudo apt-get install graphicsmagick` on Linux
